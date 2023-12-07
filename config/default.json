@@ -1,0 +1,4 @@
+{
+    "mongoURI": "mongodb+srv://aymanawal10:aymanawal10@twitter.ruibdpe.mongodb.net/?retryWrites=true&w=majority",
+    "jwtSecret": "mysecrettoken"
+}
