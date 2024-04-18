@@ -4,6 +4,7 @@ const auth = require('../../middleware/auth');
 
 const Profile = require('../../models/Profile');
 const User = require('../../models/User');
+const { check } = require("express-validator");
 
 // @route   GET api/profile/me 
 // @desc    Get logged in user's profile
@@ -23,5 +24,13 @@ router.get('/me', auth, async (req, res) => {
         res.status(500).send('Server Error')
     }
 });
+
+// @route   POST api/profile/me 
+// @desc    Create or update user profile
+// @access  Private
+
+router.post('/', [auth, [
+    check('status', 'Status is required')
+]] , (req, res) =>{})
 
 module.exports = router;
