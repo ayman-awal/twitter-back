@@ -5,6 +5,14 @@ const ProfileSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'user'
   },
+  bookmarks: [
+    {
+      post: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'post'
+      }
+    }
+  ],
   website: {
     type: String
   },

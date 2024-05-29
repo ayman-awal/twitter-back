@@ -4,6 +4,7 @@ const auth = require('../../middleware/auth');
 
 const Profile = require('../../models/Profile');
 const User = require('../../models/User');
+const Post = require('../../models/Post');
 const { check, validationResult } = require("express-validator");
 
 // @route   GET api/profile/me 
@@ -123,6 +124,99 @@ router.delete("/", auth, async (req, res) => {
     }
 
 });
+
+// @route   PUT api/profile/bookmark/add/:post_id
+// @desc    Add bookmark
+// @access  Private
+
+router.put("/bookmark/add/:id", auth, async (req, res) => {
+    try {
+        const profile = await Profile.findOne({user: req.user.id}).populate('user', ['name']);
+
+        if (!profile){
+            return res.status(400).json({msg: "There is no profile for this user"});
+        }
+
+        const post = await Post.findById(req.params.id);
+
+        if(!post){
+            return res.status(400).json({msg: "There is no profile for this user"});
+        }
+
+        if(profile.bookmarks.filter(bookmark => bookmark.post.toString() === req.params.id)){
+            return res.status(400).json({msg: 'Post already bookmarked'});
+        }
+
+        profile.bookmarks.unshift({post: req.params.id});
+
+        await profile.save();
+
+        res.json(profile.bookmarks);
+        
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
+// @route   PUT api/profile/bookmark/remove/:post_id
+// @desc    Remove bookmark
+// @access  Private
+
+router.put('/bookmark/remove/:id', auth, async (req, res) => {
+    try {
+        const profile = await Profile.findOne({user: req.user.id}).populate('user', ['name']);
+
+        if (!profile){
+            return res.status(400).json({msg: "There is no profile for this user"});
+        }
+
+        const post = await Post.findById(req.params.id);
+
+        if(!post){
+            return res.status(400).json({msg: "There is no profile for this user"});
+        }
+
+        if(profile.bookmarks.filter(bookmark => bookmark.post.toString() === req.params.id).length == 0){
+            return res.status(400).json({msg: 'Post not bookmarked yet'});
+        }
+
+
+        const removeIndex = profile.bookmarks.map(bookmark => bookmark.post.toString()).indexOf(req.params.id);
+
+        profile.bookmarks.splice(removeIndex, 1);
+
+        await profile.save();
+
+        res.json(profile.bookmarks);
+
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send('Server Error');
+    }
+});
+
+// @route   GET api/profile/bookmark
+// @desc    Get all bookmarks
+// @access  Private
+
+router.get("/bookmark", auth, async (req, res) => {
+    try {
+        const profile = await Profile.findOne({user: req.user.id}).populate('user', ['name']);
+
+        if (!profile){
+            return res.status(400).json({msg: "There is no profile for this user"});
+        }
+
+        res.json(profile.bookmarks);
+
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+});
+
+
 
 
 module.exports = router;
