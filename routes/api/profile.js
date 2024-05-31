@@ -143,15 +143,17 @@ router.put("/bookmark/add/:id", auth, async (req, res) => {
             return res.status(400).json({msg: "There is no profile for this user"});
         }
 
-        if(profile.bookmarks.filter(bookmark => bookmark.post.toString() === req.params.id)){
-            return res.status(400).json({msg: 'Post already bookmarked'});
-        }
+        // if(profile.bookmarks.filter(bookmark => bookmark.post.toString() === req.params.id)){
+        //     return res.status(400).json({msg: 'Post already bookmarked'});
+        // }
 
         profile.bookmarks.unshift({post: req.params.id});
 
         await profile.save();
 
-        res.json(profile.bookmarks);
+        // res.json(profile.bookmarks);
+        const postArray = profile.bookmarks.map(bookmark => bookmark.post);
+        res.json(postArray);
         
     } catch (err) {
         console.error(err.message);
@@ -188,7 +190,10 @@ router.put('/bookmark/remove/:id', auth, async (req, res) => {
 
         await profile.save();
 
-        res.json(profile.bookmarks);
+        // res.json(profile.bookmarks);
+
+        const postArray = profile.bookmarks.map(bookmark => bookmark.post);
+        res.json(postArray);
 
     } catch (error) {
         console.error(error.message);
@@ -196,11 +201,11 @@ router.put('/bookmark/remove/:id', auth, async (req, res) => {
     }
 });
 
-// @route   GET api/profile/bookmark
+// @route   GET api/profile/bookmarks/me
 // @desc    Get all bookmarks
 // @access  Private
 
-router.get("/bookmark", auth, async (req, res) => {
+router.get("/bookmarks/me", auth, async (req, res) => {
     try {
         const profile = await Profile.findOne({user: req.user.id}).populate('user', ['name']);
 
@@ -208,7 +213,16 @@ router.get("/bookmark", auth, async (req, res) => {
             return res.status(400).json({msg: "There is no profile for this user"});
         }
 
-        res.json(profile.bookmarks);
+        const postArray = profile.bookmarks.map(bookmark => bookmark.post);
+        res.json(postArray);
+
+        // let postArray = [];
+
+        // for(let i; i < profile.bookmarks.length; i++){
+        //     postArray.push(profile.bookmarks[i].post);
+        // }
+
+        // res.json(postArray);
 
     } catch (err) {
         console.error(err.message);
