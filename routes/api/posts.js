@@ -25,6 +25,7 @@ router.post('/', [auth, [
         const newPost = new Post({
             text: req.body.text,
             user: req.user.id,
+            username: user.username,
             name: user.name
         });
 

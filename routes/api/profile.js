@@ -54,6 +54,7 @@ router.post('/', auth, async (req, res) =>{
 
     try {
         let profile = await Profile.findOne({user: req.user.id});
+        let user = await User.findOne({_id: req.user.id});
         
         if(profile){
             profile = await Profile.findOneAndUpdate({user: req.user.id}, {$set: profileFields}, {new: true});
@@ -61,6 +62,7 @@ router.post('/', auth, async (req, res) =>{
         }
         
         profile = new Profile(profileFields);
+        profile.username = user.username;
         await profile.save();
         
         res.json(profile);
@@ -148,8 +150,10 @@ router.put("/bookmark/add/:id", auth, async (req, res) => {
         // }
 
         profile.bookmarks.unshift({post: req.params.id});
+        post.bookmarked = true;
 
         await profile.save();
+        await post.save();
 
         // res.json(profile.bookmarks);
         const postArray = profile.bookmarks.map(bookmark => bookmark.post);
@@ -183,12 +187,13 @@ router.put('/bookmark/remove/:id', auth, async (req, res) => {
             return res.status(400).json({msg: 'Post not bookmarked yet'});
         }
 
-
         const removeIndex = profile.bookmarks.map(bookmark => bookmark.post.toString()).indexOf(req.params.id);
 
         profile.bookmarks.splice(removeIndex, 1);
+        post.bookmarked = false;
 
         await profile.save();
+        await post.save();
 
         // res.json(profile.bookmarks);
 
