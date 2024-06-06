@@ -176,7 +176,8 @@ router.post('/comment/:id', [auth, [
         const newComment = new Post({
             text: req.body.text,
             user: req.user.id,
-            name: user.name
+            name: user.name,
+            username: user.username
         });
 
         post.comments.unshift(newComment);

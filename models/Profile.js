@@ -16,6 +16,30 @@ const ProfileSchema = new mongoose.Schema({
       }
     }
   ],
+  posts: [
+    {
+      post: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'post'
+      }
+    }
+  ],
+  following: [
+    {
+      user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'user'
+      }
+    }
+  ],
+  followers: [
+    {
+      user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'user'
+      }
+    }
+  ],
   website: {
     type: String
   },
