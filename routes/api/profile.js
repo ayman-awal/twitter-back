@@ -237,7 +237,7 @@ router.get("/bookmarks/me", auth, async (req, res) => {
     }
 });
 
-// @route   PUT api/profile/follow/
+// @route   PUT api/profile/follow/:id
 // @desc    Follow user
 // @access  Private
 
@@ -262,6 +262,32 @@ router.put("/follow/:id", auth, async(req, res) => {
         
     }
 })
+
+// @route   PUT api/profile/unfollow/
+// @desc    Follow user
+// @access  Private
+
+// router.put("/follow/:id", auth, async(req, res) => {
+//     try {
+//         const loggedInUser = await Profile.findOne({user: req.user.id});
+//         const user = await Profile.findOne({user: req.params.id});
+
+//         // if(loggedInUser.following.filter(follow => follow.user.toString() === user.id)){
+//         //     return res.status(400).json({msg: 'Already following this user'});
+//         // }
+
+//         loggedInUser.following.unshift({user: user.id});
+//         user.followers.unshift({user: loggedInUser.id});
+
+//         await loggedInUser.save();
+//         await user.save();
+        
+//         res.json(user);
+
+//     } catch (error) {
+        
+//     }
+// })
 
 
 

@@ -21,6 +21,7 @@ router.post('/', [auth, [
  
     try {
         const user = await User.findById(req.user.id).select('-password');
+        const profile = await Profile.findOne({user: req.user.id});
 
         const newPost = new Post({
             text: req.body.text,
@@ -30,7 +31,11 @@ router.post('/', [auth, [
         });
 
         const post = await newPost.save();
-        res.json(post);
+
+        profile.posts.unshift({post: post.id});
+        await profile.save();
+
+        res.json({post});
     } catch (error) {
         console.error(error);
         res.status(500).send('Server Error');
@@ -38,6 +43,21 @@ router.post('/', [auth, [
 });
 
 // @route   GET api/posts
+// @desc    Get all posts
+// @access  Private
+
+router.get('/', auth, async (req, res) => {
+    try {
+        const posts = await Post.find().sort({date: -1});
+        res.json(posts);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server Error');
+    }
+});
+
+// @route   GET api/posts/user:id
 // @desc    Get all posts
 // @access  Private
 
@@ -229,6 +249,32 @@ router.delete('/comment/:id/:comment_id', auth, async (req, res) => {
     }
 });
 
+// @route   GET api/posts/comments/me
+// @desc    Get logged in user's comments
+// @access  Private
+
+router.get('/comments/me', auth, async (req, res) =>{
+    try {
+        const posts = await Post.find({}).lean();
+        let commentsArray = [];
+
+        posts?.map((post) => {
+            if(post.comments.length > 0){
+                post.comments.map((comment) => {
+                    if((comment.user).toString() === req.user.id){
+                        comment.authorName = post.username;
+                        
+                        commentsArray.push(comment);
+                    }
+                })
+            }
+        })
+
+        res.json(commentsArray);
+    } catch (error) {
+        
+    }
+});
 
 
 module.exports = router;
