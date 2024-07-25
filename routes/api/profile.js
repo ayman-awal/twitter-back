@@ -65,6 +65,7 @@ router.post('/', auth, async (req, res) =>{
         profileFields.posts = posts;
         profile = new Profile(profileFields);
         profile.username = user.username;
+        profile.name = user.name;
         await profile.save();
         
         res.json(profile);
@@ -257,6 +258,25 @@ router.put("/follow/:id", auth, async(req, res) => {
         await user.save();
         
         res.json(user);
+
+    } catch (error) {
+        
+    }
+})
+
+// @route   PUT api/profile/username
+// @desc    get profile by username
+// @access  Private
+
+router.get("/:username", auth, async (req, res) => {
+    try {
+        const profile = await Profile.findOne({username: req.params.username});
+
+        if(profile){
+            return res.json(profile);
+        }
+
+        res.json({msg: "Profile with that username does not exist"});
 
     } catch (error) {
         
