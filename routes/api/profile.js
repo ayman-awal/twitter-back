@@ -251,8 +251,8 @@ router.put("/follow/:id", auth, async(req, res) => {
         //     return res.status(400).json({msg: 'Already following this user'});
         // }
 
-        loggedInUser.following.unshift({user: user.id});
-        user.followers.unshift({user: loggedInUser.id});
+        loggedInUser.following.unshift({user: req.params.id});
+        user.followers.unshift({user: req.user.id});
 
         await loggedInUser.save();
         await user.save();
@@ -260,34 +260,16 @@ router.put("/follow/:id", auth, async(req, res) => {
         res.json(user);
 
     } catch (error) {
-        
+        res.status(500).send('Server Error');
     }
 })
 
-// @route   PUT api/profile/username
-// @desc    get profile by username
-// @access  Private
-
-router.get("/:username", auth, async (req, res) => {
-    try {
-        const profile = await Profile.findOne({username: req.params.username});
-
-        if(profile){
-            return res.json(profile);
-        }
-
-        res.json({msg: "Profile with that username does not exist"});
-
-    } catch (error) {
-        
-    }
-})
 
 // @route   PUT api/profile/unfollow/
-// @desc    Follow user
+// @desc    Unfollow user
 // @access  Private
 
-// router.put("/follow/:id", auth, async(req, res) => {
+// router.put("/unfollow/:id", auth, async(req, res) => {
 //     try {
 //         const loggedInUser = await Profile.findOne({user: req.user.id});
 //         const user = await Profile.findOne({user: req.params.id});
@@ -308,6 +290,67 @@ router.get("/:username", auth, async (req, res) => {
         
 //     }
 // })
+
+
+
+// @route   PUT api/profile/username
+// @desc    get profile by username
+// @access  Private
+
+router.get("/:username", auth, async (req, res) => {
+    try {
+        const profile = await Profile.findOne({username: req.params.username});
+
+        if(profile){
+            return res.json(profile);
+        }
+
+        res.json({msg: "Profile with that username does not exist"});
+
+    } catch (error) {
+        
+    }
+})
+
+// @route   GET api/profile/following/:username
+// @desc    Get following by username
+// @access  Private
+
+router.get("/following/:username", auth, async (req, res) => {
+    try {
+        const profile = await Profile.findOne({username: req.params.username});
+
+        if (!profile){
+            return res.json({msg: 'Profile does not exist'});
+        }
+
+        res.json(profile.following);
+
+    } catch (error) {
+        res.status(500).send('Server Error');
+    }
+})
+
+// @route   GET api/profile/followers/:username
+// @desc    Get followers by username
+// @access  Private
+
+router.get("/followers/:username", auth, async (req, res) => {
+    try {
+        const profile = await Profile.findOne({username: req.params.username});
+
+        if (!profile){
+            return res.json({msg: 'Profile does not exist'});
+        }
+
+        res.json(profile.followers);
+
+    } catch (error) {
+        res.status(500).send('Server Error');
+    }
+})
+
+
 
 
 

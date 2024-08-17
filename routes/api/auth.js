@@ -7,6 +7,7 @@ const jwt = require('jsonwebtoken');
 const config = require('config')
 
 const User = require('../../models/User');
+const Profile = require("../../models/Profile");
 
 // @route   GET api/auth
 // @desc    TEST route
@@ -37,6 +38,7 @@ router.post('/',[
 
     try {
         let user = await User.findOne({email});
+        let profile = await Profile.findOne({username: user.username});
 
         if(!user){
             return res.status(400).json({errors: [{msg:'Invalid Credentials'}]})
@@ -56,6 +58,9 @@ router.post('/',[
 
         jwt.sign(payload, config.get('jwtSecret'), {expiresIn: 360000000}, (err, token) => {
             if(err) throw err;
+            if(profile){
+                res.json({ token, id: user.id, username: user.username, name: user.name, profile: {following: profile.following, followers: profile.followers} }); 
+            }
             res.json({ token, id: user.id, username: user.username, name: user.name });
         })
 
