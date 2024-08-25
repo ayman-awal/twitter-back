@@ -148,12 +148,13 @@ router.put("/bookmark/add/:id", auth, async (req, res) => {
             return res.status(400).json({msg: "There is no profile for this user"});
         }
 
-        // if(profile.bookmarks.filter(bookmark => bookmark.post.toString() === req.params.id)){
-        //     return res.status(400).json({msg: 'Post already bookmarked'});
-        // }
+        const isBookmarked = profile.bookmarks.some(bookmark => bookmark.post.toString() === req.params.id);
+
+        if(isBookmarked){
+            return res.status(400).json({msg: 'Post already bookmarked'});
+        }
 
         profile.bookmarks.unshift({post: req.params.id});
-        post.bookmarked = true;
 
         await profile.save();
         await post.save();
@@ -186,22 +187,25 @@ router.put('/bookmark/remove/:id', auth, async (req, res) => {
             return res.status(400).json({msg: "There is no profile for this user"});
         }
 
-        if(profile.bookmarks.filter(bookmark => bookmark.post.toString() === req.params.id).length == 0){
+        if(profile.bookmarks.length < 1){
+            return res.status(400).json({msg: 'Bookmarks list is empty, cannot remove bookmark'});
+        }
+
+        const isBookmarked = profile.bookmarks.some(bookmark => bookmark.post.toString() === req.params.id);
+
+        if(!isBookmarked){
             return res.status(400).json({msg: 'Post not bookmarked yet'});
         }
 
         const removeIndex = profile.bookmarks.map(bookmark => bookmark.post.toString()).indexOf(req.params.id);
 
         profile.bookmarks.splice(removeIndex, 1);
-        post.bookmarked = false;
 
         await profile.save();
         await post.save();
 
-        // res.json(profile.bookmarks);
-
         const postArray = profile.bookmarks.map(bookmark => bookmark.post);
-        res.json(postArray);
+        res.status(200).json(postArray);
 
     } catch (error) {
         console.error(error.message);

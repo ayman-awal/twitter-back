@@ -45,10 +45,6 @@ const PostSchema = new mongoose.Schema({
             }
         }
     ],
-    bookmarked: {
-        type: Boolean,
-        default: false
-    },
     date:{
         type: Date,
         default: Date.now

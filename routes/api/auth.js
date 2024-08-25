@@ -59,7 +59,7 @@ router.post('/',[
         jwt.sign(payload, config.get('jwtSecret'), {expiresIn: 360000000}, (err, token) => {
             if(err) throw err;
             if(profile){
-                res.json({ token, id: user.id, username: user.username, name: user.name, profile: {following: profile.following, followers: profile.followers} }); 
+                res.json({ token, id: user.id, username: user.username, name: user.name, profile: {following: profile.following, followers: profile.followers, bookmarks: profile.bookmarks} }); 
             }
             res.json({ token, id: user.id, username: user.username, name: user.name });
         })
